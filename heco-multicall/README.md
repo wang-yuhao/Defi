@@ -11,6 +11,7 @@ Heco multicall address is from [Heco Verified Contract repository](https://hecos
 
 ```
 $ npm install
+$ npm i --save-dev @types/node
 $ tsc -t es5 example_hec_pairs.ts
 $ node example_hec_pairs.js
 ```
