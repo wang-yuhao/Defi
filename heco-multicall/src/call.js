@@ -1,5 +1,4 @@
 "use strict";
-// The multicall
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,60 +36,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var src_1 = require("./src");
+exports.all = void 0;
 var ethers_1 = require("ethers");
-//const worker = require('worker_threads.js')
-var start = new Date().getTime();
-var http = require('http');
-var Web3HttpProvider = require('web3-providers-http');
-var options = {
-    keepAlive: true,
-    timeout: 60000,
-    headers: [{ name: 'Access-Control-Allow-Origin', value: '*' }],
-    withCredentials: false,
-    //agent: {http: http.Agent(...), baseUrl: ''}
-};
-var web3Provider = new Web3HttpProvider('https://http-mainnet.hecochain.com', options);
-var provider = new ethers_1.ethers.providers.Web3Provider(web3Provider);
-var hrc20Abi = require('./abi/mdx_factory_pair_abi.json');
-var pairs_all = require('./pairs.json');
-function call(pairs) {
+var abi_1 = require("./abi");
+var multicall_1 = require("./abi/multicall");
+function all(calls, multicallAddress, provider) {
     return __awaiter(this, void 0, void 0, function () {
-        var ethcallProvider, contractCallArray, dataArray, end, time;
+        var multicall, callRequests, response, callCount, callResult, i, outputs, returnData, params, result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    ethcallProvider = new src_1.Provider(provider);
-                    return [4 /*yield*/, ethcallProvider.init()];
-                case 1:
-                    _a.sent();
-                    contractCallArray = [];
-                    pairs.forEach(function (pair) {
-                        var singleContract = new src_1.Contract(pair["address"], hrc20Abi);
-                        var singleContractCall = singleContract.getReserves();
-                        contractCallArray.push(singleContractCall);
+                    multicall = new ethers_1.ethers.Contract(multicallAddress, multicall_1.multicallAbi, provider);
+                    callRequests = calls.map(function (call) {
+                        var callData = abi_1.Abi.encode(call.name, call.inputs, call.params);
+                        return {
+                            target: call.contract.address,
+                            callData: callData,
+                        };
                     });
-                    return [4 /*yield*/, ethcallProvider.all(contractCallArray)];
-                case 2:
-                    dataArray = _a.sent();
-                    end = new Date().getTime();
-                    time = end - start;
-                    console.log('Execution time: ' + time);
-                    return [2 /*return*/];
+                    return [4 /*yield*/, multicall.aggregate(callRequests)];
+                case 1:
+                    response = _a.sent();
+                    callCount = calls.length;
+                    callResult = [];
+                    for (i = 0; i < callCount; i++) {
+                        outputs = calls[i].outputs;
+                        returnData = response.returnData[i];
+                        params = abi_1.Abi.decode(outputs, returnData);
+                        result = outputs.length === 1 ? params[0] : params;
+                        callResult.push(result);
+                    }
+                    return [2 /*return*/, callResult];
             }
         });
     });
 }
-var i = 0;
-var pairStep = 3000;
-while (i < pairs_all.length) {
-    if (i + pairStep > pairs_all.length) {
-        call(pairs_all.slice(i, pairs_all.length));
-        console.log(i);
-    }
-    else {
-        call(pairs_all.slice(i, i + pairStep));
-        console.log(i);
-    }
-    i = i + pairStep;
-}
+exports.all = all;

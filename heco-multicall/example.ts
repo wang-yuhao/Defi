@@ -1,4 +1,4 @@
-import { Contract, Provider } from 'ethers-multicall';
+import { Contract, Provider } from './src';
 import { ethers } from 'ethers';
 
 const erc20Abi = require('erc-20-abi')

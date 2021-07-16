@@ -1,6 +1,6 @@
 // The multicall
 
-import { Contract, Provider } from 'ethers-multicall';
+import { Contract, Provider } from './src';
 import { ethers } from 'ethers';
 //const worker = require('worker_threads.js')
 const start = new Date().getTime();
