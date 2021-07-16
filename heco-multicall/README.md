@@ -36,7 +36,6 @@ Like this:
 ```js
 // The multicall
 
-<<<<<<< HEAD
 import { Contract, Provider } from './src';
 import { ethers } from 'ethers';
 
@@ -58,39 +57,11 @@ const hrc20Abi = require('./abi/mdx_factory_pair_abi.json');
 const pairs = require('./pairs.json');
 const myAddress = '0x5293fEb1fc5c934C7a263ab73D6ee70517F46E84'
 
-async function call() {
-=======
-import { Contract, Provider } from 'ethers-multicall';
-import { ethers } from 'ethers';
-
-const http = require('http');
-const Web3HttpProvider = require('web3-providers-http');
-
-const options = {
-    keepAlive: true,
-    timeout: 20000, // milliseconds,
-    //headers: [{name: 'Access-Control-Allow-Origin', value: '*'},{...}],
-    withCredentials: false,
-    //agent: {http: http.Agent(...), baseUrl: ''}
-};
-
-const web3Provider = new Web3HttpProvider('https://http-mainnet.hecochain.com', {timeout:600});
-const provider = new ethers.providers.Web3Provider(web3Provider)
-
-//const infuraKey = '14abaf422f2649989c72f561aef24046';
-//const provider = new ethers.providers.InfuraProvider('mainnet', infuraKey);
-
-const hrc20Abi = require('./abi/mdx_factory_pair_abi.json');
-const pairs = require('./pairs.json');
-
-const myAddress = '0x5293fEb1fc5c934C7a263ab73D6ee70517F46E84'
-
 
 
 async function call() {
   //const { chainId } = await provider.getNetwork();
   //console.log("chainId:", chainId)
->>>>>>> 11044f52440f4c59a91615557498d56c8c87f7b9
   const ethcallProvider = new Provider(provider);
   await ethcallProvider.init();
   const iface = new ethers.utils.Interface(hrc20Abi);
@@ -102,13 +73,6 @@ async function call() {
   const ethBalanceCall = ethcallProvider.getEthBalance(uniswapDaiPool);
   const daiBalanceCall = daiContract.getReserves();
 
-<<<<<<< HEAD
-  console.log('daiBalanceCall', daiBalanceCall);
-  const data = await ethcallProvider.all([daiBalanceCall]);
-  const daiBalance = data[0];
-
-  console.log('eth balance', daiBalance.toString());
-=======
   //console.log(ethcallProvider)
   console.log('daiBalanceCall', daiBalanceCall);
   const data = await ethcallProvider.all([daiBalanceCall]);
@@ -118,7 +82,6 @@ async function call() {
   console.log('eth balance', daiBalance.toString());
   
   //console.log('dai balance', data);
->>>>>>> 11044f52440f4c59a91615557498d56c8c87f7b9
 
   const dairesult = await provider.call({
   // ENS public resovler address
