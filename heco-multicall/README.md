@@ -95,8 +95,6 @@ async function call() {
   data: iface.encodeFunctionData('getReserves', [] )
 });
   console.log("getReserves:", parseInt(iface.decodeFunctionResult("getReserves",dairesult).reserve0._hex.toString(), 16));
-
-
 }
 
 call();
