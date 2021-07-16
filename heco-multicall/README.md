@@ -2,20 +2,33 @@
 
 Utility library to make calls to Ethereum blockchain.
 
-Uses MakerDAO's [Multicall contract](https://github.com/makerdao/multicall) to make multiple requests in a single HTTP query. Encodes and decodes data automatically.
+Based on MakerDAO's [Multicall contract](https://github.com/makerdao/multicall) to make multiple requests in a single HTTP query. Encodes and decodes data automatically.
 
 Inspired and powered by [ethers.js](https://github.com/ethers-io/ethers.js/).
 
+Heco multicall address is from [Heco Verified Contract repository](https://hecoscan.xyz/contractsVerified?cn=multicall&filter=)
+
+
 ```
-npm install ethcall
+$ npm install
+$ tsc example_hec_pairs.ts
+$ node example_hec_pairs.js
 ```
+
+# Attention:
+Since the original ethers-multicall does not support Heco chain, so the additional multicall contract address on Hco must be added in to provider.ts. The Chian_id of Heco mainnet is 128. 
+
+Like this:
+[!image](./screenshot/addHecoMulticallAddress.png)
+
+
 
 ## API
 
 * `Contract(address, abi)`: create contract instance; calling `contract.call_func_name` will yield a `call` object.
 * `all(calls)`: execute all calls in a single request.
 * `calls`: list of helper call methods
-  * `getEthBalance(address)`: returns account ether balance
+* `getEthBalance(address)`: returns account ether balance
 
 ## Example
 
