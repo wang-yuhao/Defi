@@ -1,4 +1,4 @@
-# ethcall
+# heco-multicall
 
 Utility library to make calls to Ethereum blockchain.
 
@@ -34,37 +34,71 @@ Like this:
 ## Example
 
 ```js
-import { Contract, Provider } from 'ethcall';
-import { InfuraProvider } from '@ethersproject/providers';
+// The multicall
 
-import erc20Abi from './abi/erc20.json';
+import { Contract, Provider } from 'ethers-multicall';
+import { ethers } from 'ethers';
 
-const infuraKey = 'INSERT_YOUR_KEY_HERE';
-const provider = new InfuraProvider('mainnet', infuraKey);
+const http = require('http');
+const Web3HttpProvider = require('web3-providers-http');
 
-const daiAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
+const options = {
+    keepAlive: true,
+    timeout: 20000, // milliseconds,
+    //headers: [{name: 'Access-Control-Allow-Origin', value: '*'},{...}],
+    withCredentials: false,
+    //agent: {http: http.Agent(...), baseUrl: ''}
+};
+
+const web3Provider = new Web3HttpProvider('https://http-mainnet.hecochain.com', {timeout:600});
+const provider = new ethers.providers.Web3Provider(web3Provider)
+
+//const infuraKey = '14abaf422f2649989c72f561aef24046';
+//const provider = new ethers.providers.InfuraProvider('mainnet', infuraKey);
+
+const hrc20Abi = require('./abi/mdx_factory_pair_abi.json');
+const pairs = require('./pairs.json');
+
+const myAddress = '0x5293fEb1fc5c934C7a263ab73D6ee70517F46E84'
+
+
 
 async function call() {
-	const ethcallProvider = new Provider();
-	await ethcallProvider.init(provider);
+  //const { chainId } = await provider.getNetwork();
+  //console.log("chainId:", chainId)
+  const ethcallProvider = new Provider(provider);
+  await ethcallProvider.init();
+  const iface = new ethers.utils.Interface(hrc20Abi);
 
-	const daiContract = new Contract(daiAddress, erc20Abi);
+  const daiContract = new Contract(myAddress, hrc20Abi);
 
-	const uniswapDaiPool = '0x2a1530c4c41db0b0b2bb646cb5eb1a67b7158667';
+  const uniswapDaiPool = "0xdDE0D948B0597F08878620f1Afd3070dC7243386"
 
-	const ethBalanceCall = ethcallProvider.getEthBalance(uniswapDaiPool);
-	const daiBalanceCall = daiContract.balanceOf(uniswapDaiPool);
+  const ethBalanceCall = ethcallProvider.getEthBalance(uniswapDaiPool);
+  const daiBalanceCall = daiContract.getReserves();
 
-	const data = await ethcallProvider.all([ethBalanceCall, daiBalanceCall]);
+  //console.log(ethcallProvider)
+  console.log('daiBalanceCall', daiBalanceCall);
+  const data = await ethcallProvider.all([daiBalanceCall]);
+  //const ethBalance = data[0];
+  const daiBalance = data[0];
 
-	const ethBalance = data[0];
-	const daiBalance = data[1];
+  console.log('eth balance', daiBalance.toString());
+  
+  //console.log('dai balance', data);
 
-	console.log('eth balance', ethBalance.toString());
-	console.log('dai balance', daiBalance.toString());
+  const dairesult = await provider.call({
+  // ENS public resovler address
+  to: "0x5293fEb1fc5c934C7a263ab73D6ee70517F46E84",
+
+  // `function addr(namehash("ricmoo.eth")) view returns (address)`
+  data: iface.encodeFunctionData('getReserves', [] )
+});
+  console.log("getReserves:", parseInt(iface.decodeFunctionResult("getReserves",dairesult).reserve0._hex.toString(), 16));
+
+
 }
 
 call();
-
 ```
 
