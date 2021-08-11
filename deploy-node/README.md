@@ -57,13 +57,13 @@ $ txpool.status
 check the peerCount
 
 ```
-net.peerCount
+$ net.peerCount
 ```
 
 check the blockNumber:
 
 ```
-eth.blockNumber
+$ eth.blockNumber
 ```
 
 More commands about the Geth is [here](https://geth.ethereum.org/docs/interface/command-line-options).
